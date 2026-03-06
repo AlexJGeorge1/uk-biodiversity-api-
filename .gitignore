@@ -145,7 +145,7 @@ env.bak/
 venv.bak/
 
 # Data (raw source files)
-data/raw/
+data/
 
 # Spyder project settings
 .spyderproject

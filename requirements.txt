@@ -1,1 +1,6 @@
 # Python package dependencies for UK biodiversity API backend.
+
+pandas==2.3.3
+odfpy==1.4.1
+psycopg2-binary
+python-dotenv==1.2.1

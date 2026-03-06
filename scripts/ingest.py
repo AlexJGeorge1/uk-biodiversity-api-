@@ -1,5 +1,13 @@
+import logging
 import os
+
 import pandas as pd
+import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 RAW_DIR = "data/raw"
 
@@ -36,12 +44,6 @@ def clean_farmland_birds() -> pd.DataFrame:
 
 
 def clean_butterflies() -> pd.DataFrame:
-    """
-    Extract generalist_butterflies and specialist_butterflies from but_data_102015.csv.
-
-    This file has clean headers. Farmland smoothed -> generalist_butterflies;
-    woodland smoothed -> specialist_butterflies. Values are already on a 100-base index.
-    """
     path = os.path.join(RAW_DIR, "but_data_102015.csv")
     df = pd.read_csv(path)
 
@@ -66,7 +68,7 @@ def clean_butterflies() -> pd.DataFrame:
 def clean_priority_species() -> pd.DataFrame:
     path = os.path.join(RAW_DIR, "Eng_BDI_4a_Priority_species_abundance.ods")
     # skiprows=4 skips source note, table note, change note, and blank row
-    df = pd.read_excel(path, sheet_name="1", skiprows=4, engine="odf")
+    df = pd.read_excel(path, sheet_name="1", skiprows=5, engine="odf")
     result = pd.DataFrame({
         "indicator_name": INDICATOR_PRIORITY_SPECIES,
         "year": df["Year"].astype(int),
@@ -91,5 +93,39 @@ def clean_all() -> dict[str, pd.DataFrame]:
     return frames
 
 
+def insert_into_db(frames: dict[str, pd.DataFrame]) -> None:
+    conn = psycopg2.connect(
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT", 5432),
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+    )
+
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                total = 0
+                for indicator_name, df in frames.items():
+                    rows = [
+                        (row["indicator_name"], int(row["year"]), float(row["index_value"]))
+                        for _, row in df.iterrows()
+                    ]
+                    cur.executemany(
+                        """
+                        INSERT INTO biodiversity_indicators (indicator_name, year, index_value)
+                        VALUES (%s, %s, %s)
+                        ON CONFLICT (indicator_name, year) DO NOTHING
+                        """,
+                        rows,
+                    )
+                    logging.info("%s: %d rows inserted", indicator_name, len(rows))
+                    total += len(rows)
+                logging.info("Done — %d total rows inserted", total)
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
-    inspect_raw_files()
+    frames = clean_all()
+    insert_into_db(frames)
