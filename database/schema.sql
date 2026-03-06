@@ -1,1 +1,1 @@
--- Database table definitions.
+-- SQL schema defining biodiversity_indicators table and related constraints.

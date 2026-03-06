@@ -1,1 +1,1 @@
-"""Ask route handlers."""
+"""Route handlers for natural-language biodiversity ask endpoint."""

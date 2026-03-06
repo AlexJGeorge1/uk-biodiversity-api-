@@ -1,1 +1,1 @@
-"""AI integration wrapper."""
+"""Service for calling OpenAI to explain indicator trends."""

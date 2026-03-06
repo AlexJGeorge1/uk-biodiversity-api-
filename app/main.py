@@ -1,1 +1,1 @@
-"""FastAPI app entry point."""
+"""FastAPI application entry point and startup configuration."""
