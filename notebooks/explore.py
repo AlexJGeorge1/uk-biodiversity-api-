@@ -1,8 +1,3 @@
-"""
-Exploratory script — inspect each raw CSV before processing.
-Run from project root: python notebooks/explore.py
-"""
-
 import os
 import pandas as pd
 
@@ -14,12 +9,9 @@ for filename in os.listdir(RAW_DIR):
 
     path = os.path.join(RAW_DIR, filename)
     df = pd.read_csv(path)
-
     print(f"\n{'=' * 60}")
     print(f"File:    {filename}")
     print(f"Columns: {list(df.columns)}")
-
-    # Attempt to detect a year column and a value column
     year_col = next((c for c in df.columns if "year" in c.lower()), None)
     val_col = next((c for c in df.columns if "index" in c.lower() or "value" in c.lower()), None)
 
