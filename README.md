@@ -1,2 +1,1 @@
-# uk-habitat-health-api
-A RESTful API for analysing UK habitat coverage and ecosystem health indicators using open government environmental datasets.
+**`A RESTful web API for querying UK biodiversity indicators with AI-generated ecological insights.`**
