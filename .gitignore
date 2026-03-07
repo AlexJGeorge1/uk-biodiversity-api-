@@ -213,3 +213,6 @@ __marimo__/
 
 # AI conversation log — never commit
 cursor_log.md
+
+# Design decisions log — never commit
+decisions/
