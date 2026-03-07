@@ -1,13 +1,6 @@
-"""
-Database connection module.
-Provides get_connection() which returns a live psycopg2 connection using
-credentials loaded from the .env file. Called by the DB layer functions —
-never called directly from routes or services.
-"""
 
 import logging
 import os
-
 import psycopg2
 from dotenv import load_dotenv
 
@@ -25,15 +18,7 @@ def get_connection() -> psycopg2.extensions.connection:
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
     )
-
-
 def test_connection() -> bool:
-    """
-    Verify the database is reachable by running SELECT 1.
-
-    Returns True if the connection succeeds, False otherwise.
-    Used by the GET /health endpoint to report database status.
-    """
     try:
         conn = get_connection()
         with conn:
